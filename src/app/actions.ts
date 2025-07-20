@@ -1,6 +1,24 @@
 "use server";
 
 import clientPromise from "@/lib/mongodb";
+// Document shape stored in MongoDB
+export interface MoodDoc {
+  entry?: string;
+  mood?: string;
+  score?: number;
+  tip?: string;
+  createdAt?: Date;
+}
+
+// Shape returned to the client (always fully defined, string date)
+export interface MoodHistoryItem {
+  entry: string;
+  mood: string;
+  score: number;
+  tip: string;
+  createdAt: string;
+}
+
 
 type MoodData = {
   sentiment: string;
