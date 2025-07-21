@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
 import clientPromise from "@/lib/mongodb";
@@ -81,18 +82,25 @@ export async function analyzeMood(entry: string) {
   return `${moodData.sentiment}: ${moodData.tip}`;
 }
 
-export async function getMoodHistory() {
+export async function getMoodHistory(): Promise<
+  { entry: string; mood: string; score: number; tip: string; createdAt: string }[]
+> {
   const client = await clientPromise;
   const db = client.db(process.env.MONGODB_DB ?? "mental_health_tracker");
   const collection = db.collection("entries");
 
   const docs = await collection.find().sort({ createdAt: 1 }).toArray();
 
-  return docs.map((d: any) => ({
+  return docs.map((d) => ({
     entry: d.entry ?? "",
     mood: d.mood ?? "Unknown",
     score: typeof d.score === "number" ? d.score : 1,
     tip: d.tip ?? "",
-    createdAt: d.createdAt instanceof Date ? d.createdAt.toISOString() : new Date().toISOString(),
+    createdAt:
+      d.createdAt instanceof Date
+        ? d.createdAt.toISOString()
+        : new Date(d.createdAt ?? Date.now()).toISOString(),
   }));
 }
+
+
